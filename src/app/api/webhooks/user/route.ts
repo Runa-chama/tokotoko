@@ -6,6 +6,9 @@ import {createUser} from "@/app/api/User/createUser";
 import {deleteUser} from "@/app/api/User/deleteUser"
 import {updateUser} from "@/app/api/User/updateUser"
 
+export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic'; 
+
 // POSTリクエスト
 export async function POST(req: Request) {
     const SIGNING_SECRET = process.env.SIGNING_SECRET;
