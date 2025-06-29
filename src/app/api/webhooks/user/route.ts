@@ -60,7 +60,7 @@ export async function POST(req: Request) {
             {
                 const { id, username, first_name, last_name, email_addresses} = evt.data;
 
-                createUser(id, username || `${first_name} ${last_name}`,email_addresses[0].email_address);
+                await createUser(id, username || `${first_name} ${last_name}`,email_addresses[0].email_address);
 
                 console.log(`User ${id} added to database.`);
                 return NextResponse.json({ message: 'User saved to DB' }, { status: 200 });
@@ -70,7 +70,7 @@ export async function POST(req: Request) {
                 const { id } = evt.data;
                 if(id)
                 {
-                    deleteUser(id);
+                    await deleteUser(id);
                     return NextResponse.json({message: 'User deleting is not available'},{status:200});
                 }
                 break;
@@ -82,7 +82,7 @@ export async function POST(req: Request) {
                 const name:string = first_name+" "+last_name;
                 if(id && name)
                 {
-                    updateUser(id,name,email_addresses[0].email_address);
+                    await updateUser(id,name,email_addresses[0].email_address);
                     return NextResponse.json({message: 'Update user info'},{status:200});
                 }
             }
