@@ -21,28 +21,25 @@ import {
 import CardActions from '@mui/material/CardActions';
 import CardContent from '@mui/material/CardContent';
 import { useEffect, useState } from "react";
-import { getClassByUserId } from "@/app/api/class/getClass";
 import { ClassFrame } from "@/app/api/class/createClass";
 import { Class, User } from "@prisma/client";
 import { useUser } from '@clerk/nextjs'
 import PersonAddAlt1Icon from '@mui/icons-material/PersonAddAlt1';
 import { useRouter } from "next/navigation";
+import { TeacherGuard } from "@/lib/guard"
 
+interface ClassData{
+    id: string,
+    name: string,
+    users: User[]
+}
 
-export default function Page() {
-    const [classes, setClasses] = useState<{id:string,name:string,users:User[]}[]>([])
+interface props{
+    classes : ClassData[]
+}
 
-    const teacherId = useUser().user?.id || "";
-
-    useEffect(() => {
-        const fetchClass = async () => {
-            const tmpClassList = await getClassByUserId(teacherId)
-            setClasses(tmpClassList)
-        }
-        fetchClass()
-    }, [teacherId])
-
-    const ClassCards = ({ classData }: { classData : {id:string,name:string,users:User[]} }) => {
+export function TeacherClassCards({classes} : props) {
+    const ClassCards = ({ classData }: { classData: { id: string, name: string, users: User[] } }) => {
         const router = useRouter();
 
         const manageButtonFunction = () => {
@@ -64,11 +61,10 @@ export default function Page() {
                                 let comp: JSX.Element[] = [];
                                 for (let i = 0; i < 5; i++) {
                                     const u = classData.users[i];
-                                    if(u && classData.users.length > 6 && i == 4)
-                                    {
+                                    if (u && classData.users.length > 6 && i == 4) {
                                         comp.push(
                                             <ListItem key={i}>
-                                                <ListItemText primary={"︙"}/>
+                                                <ListItemText primary={"︙"} />
                                             </ListItem>);
                                         break;
                                     }
@@ -80,7 +76,7 @@ export default function Page() {
                                         continue;
                                     }
                                     comp.push(
-                                        <ListItem key={u.id+i}>
+                                        <ListItem key={u.id + i}>
                                             <ListItemText primary={u.name} />
                                         </ListItem>);
                                 }
@@ -96,18 +92,18 @@ export default function Page() {
             </Card>
         );
     }
+
     return (
         <Stack>
-            <Typography variant="h4" gutterBottom>
-                Your Classes
-            </Typography>
-            <Grid container spacing={2} padding={2}>
-                {classes.map((c) => (
-                    <Grid item xs={12} sm={6} md={3} key={c.id}>
-                        <ClassCards key={c.id} classData={c} />
-                    </Grid>
-                ))}
-            </Grid>
+            <TeacherGuard>
+                <Grid container spacing={2}>
+                    {classes.map((c) => (
+                        <Grid item xs={12} sm={6} md={3} key={c.id}>
+                            <ClassCards key={c.id} classData={c} />
+                        </Grid>
+                    ))}
+                </Grid>
+            </TeacherGuard>
         </Stack>
     );
 }
